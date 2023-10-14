@@ -5,6 +5,51 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useRef, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 
+export default function App() {
+  const sheetRef = useRef();
+  const [isOpen, setIsOpen] = useState(true);
+  const snapPoints = ["30%"];
+
+  const handleMapClick = () => {
+    console.log("log");
+    sheetRef.current.snapToIndex(0);
+    setIsOpen(true);
+  };
+
+  return (
+    <View styles={styles.mainContainer}>
+      <GestureHandlerRootView style={styles.gestureHandlerRootView}>
+        <MapView
+          style={styles.map}
+          provider={PROVIDER_GOOGLE}
+          customMapStyle={mapStyleJson}
+          pitchEnabled={false}
+          rotateEnabled={false}
+          initialRegion={{
+            latitude: -33.865143,
+            longitude: 151.2099,
+            latitudeDelta: 0.1,
+            longitudeDelta: 0.1,
+          }}
+          onPress={handleMapClick}
+        ></MapView>
+
+        <BottomSheet
+          ref={sheetRef}
+          snapPoints={snapPoints}
+          style={styles.bottomSheet}
+          enablePanDownToClose={true}
+          onClose={() => setIsOpen(false)}
+        >
+          <View style={styles.bottomSheetView}>
+            <Text>Hello</Text>
+          </View>
+        </BottomSheet>
+      </GestureHandlerRootView>
+    </View>
+  );
+}
+
 const mapStyleJson = [
   {
     elementType: "geometry",
@@ -280,38 +325,6 @@ const mapStyleJson = [
   },
 ];
 
-export default function App() {
-  const sheetRef = useRef();
-  const [isOpen, setIsOpen] = useState(true);
-  const snapPoints = ["30%"];
-
-  return (
-    <View styles={styles.mainContainer}>
-      <GestureHandlerRootView style={styles.gestureHandlerRootView}>
-        <MapView
-          style={styles.map}
-          provider={PROVIDER_GOOGLE}
-          customMapStyle={mapStyleJson}
-          pitchEnabled={false}
-          rotateEnabled={false}
-          initialRegion={{
-            latitude: -33.865143,
-            longitude: 151.2099,
-            latitudeDelta: 0.1,
-            longitudeDelta: 0.1,
-          }}
-        ></MapView>
-
-        <BottomSheet ref={sheetRef} snapPoints={snapPoints}>
-          <View style={styles.bottomSheetView}>
-            <Text>Hello</Text>
-          </View>
-        </BottomSheet>
-      </GestureHandlerRootView>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
@@ -326,6 +339,9 @@ const styles = StyleSheet.create({
   gestureHandlerRootView: {
     height: "100%",
     backgroundColor: "blue",
+  },
+  bottomSheet: {
+    backgroundColor: "red",
   },
   bottomSheetView: {
     backgroundColor: "red",
