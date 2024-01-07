@@ -1,19 +1,25 @@
 import { StyleSheet, Text, View } from "react-native";
-import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import MapView, { Geojson, PROVIDER_GOOGLE, Polygon } from "react-native-maps";
+import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useRef, useState } from "react";
-import { StatusBar } from "expo-status-bar";
+import filteredGeoData from "./sydney-geo-data.json";
+import polygonData from "./polygon_transformed_data.json";
 
 export default function App() {
   const sheetRef = useRef();
   const [isOpen, setIsOpen] = useState(true);
-  const snapPoints = ["30%"];
+  const [fillColor, setFillColor] = useState("#00FF00");
+  const snapPoints = ["10%", "50%"];
 
   const handleMapClick = () => {
-    console.log("log");
+    console.log("Click");
     sheetRef.current.snapToIndex(0);
     setIsOpen(true);
+  };
+
+  const handleSuburbClick = (data) => {
+    console.log(data.feature.properties.nsw_loca_2);
   };
 
   return (
@@ -31,8 +37,33 @@ export default function App() {
             latitudeDelta: 0.1,
             longitudeDelta: 0.1,
           }}
+          minZoomLevel={10}
+          liteMode={true}
+          // userInterfaceStyle="dark"
+          // mapType="standard"
           onPress={handleMapClick}
-        ></MapView>
+        >
+          {/* <Geojson
+            tappable
+            geojson={filteredGeoData}
+            strokeColor="red"
+            fillColor={fillColor}
+            strokeWidth={2}
+            onPress={(data) => handleSuburbClick(data)}
+          /> */}
+          {polygonData.features.map((data, index) => {
+            const randomNumber = Math.floor(Math.random() * 256);
+            return (
+              <Polygon
+                coordinates={data.coordinates}
+                fillColor={`rgba(${randomNumber}, ${randomNumber}, ${randomNumber}, 0.5)`}
+                strokeColor="blue"
+                strokeWidth={2}
+                key={index}
+              />
+            );
+          })}
+        </MapView>
 
         <BottomSheet
           ref={sheetRef}
